@@ -6,23 +6,27 @@ export class SpeechToText {
     #clearButtonElement;
     #copyButtonElement;
     #recognition;
-    #_activeText;
-
+    
     isListening = false;
     
+    #_activeText;
     get activeText() {
         return this.#_activeText;
     }
 
     set activeText(value) {
         this.#_activeText = value;
-        if(this.activeTextElement) {
-            this.activeTextElement.innerText = value;
+        if(this.#activeTextElement) {
+            this.#activeTextElement.innerText = value;
         }
     }
 
-    get activeTextElement() {
+    get #activeTextElement() {
         return this.#outputElement.querySelector('.active-text');
+    }
+
+    get #outputTextElement() {
+        return this.#outputElement.querySelector('.output');
     }
 
     /**
@@ -44,6 +48,7 @@ export class SpeechToText {
     }) {
         this.#micButtonElement = typeof micElementSelector === 'string' ? document.querySelector(micElementSelector) : micElementSelector;
         this.#outputElement = typeof outputElementSelector === 'string' ? document.querySelector(outputElementSelector) : outputElementSelector;
+        this.#outputElement.innerHTML = `<span class="output"></span><span class="active-text"></span>`;
         this.#stopButtonElement = typeof stopElementSelector === 'string' ? document.querySelector(stopElementSelector) : stopElementSelector;
         this.#clearButtonElement = typeof clearElementSelector === 'string' ? document.querySelector(clearElementSelector) : clearElementSelector;
         this.#copyButtonElement = typeof copyElementSelector === 'string' ? document.querySelector(copyElementSelector) : copyElementSelector;
@@ -55,6 +60,12 @@ export class SpeechToText {
     #addEventListeners() {
         this.#micButtonElement.addEventListener('click', this.#startRecognition.bind(this));
         this.#stopButtonElement.addEventListener('click', this.#stopRecognition.bind(this));
+        this.#clearButtonElement.addEventListener('click', this.#clearEverything.bind(this));
+    }
+
+    #clearEverything() {
+        this.activeText = '';
+        this.#outputTextElement.innerHTML = ``;
     }
 
     #enableSpeechRecognition() {
@@ -107,6 +118,6 @@ export class SpeechToText {
         const textElement = document.createElement('span');
         textElement.innerText = ' '+this.activeText;
 
-        this.#outputElement.insertBefore(textElement, this.activeTextElement)
+        this.#outputTextElement.append(textElement);
     }
 }
