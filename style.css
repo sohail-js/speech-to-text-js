@@ -20,3 +20,29 @@ body {
     padding: 10px;
     border-radius: 10px;
 }
+
+.alert {
+    min-width: 250px;
+    max-width: 500px;
+    padding: 10px 15px;
+    background-color: lightgreen;
+    position: fixed;
+    left: 50%;
+    bottom: 10%;
+    transform: translateX(-50%);
+    border-radius: 6px;
+    box-shadow: 0px 4px 5px 2px #00000029;
+    animation: bottomToTop .5s;
+}
+
+@keyframes bottomToTop {
+    0% {
+        bottom: -10%;
+        opacity: 0;
+    }
+
+    100% {
+        bottom: 10%;
+        opacity: 1;
+    }
+}

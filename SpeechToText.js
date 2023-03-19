@@ -29,6 +29,10 @@ export class SpeechToText {
         return this.#outputElement.querySelector('.output');
     }
 
+    get outputText() {
+        return this.#outputTextElement.innerText;
+    }
+
     /**
      * 
      * @param {{
@@ -61,6 +65,27 @@ export class SpeechToText {
         this.#micButtonElement.addEventListener('click', this.#startRecognition.bind(this));
         this.#stopButtonElement.addEventListener('click', this.#stopRecognition.bind(this));
         this.#clearButtonElement.addEventListener('click', this.#clearEverything.bind(this));
+        this.#copyButtonElement.addEventListener('click', this.#copyOutput.bind(this));
+    }
+
+    #copyOutput() {
+        // Copy to clipboard
+        navigator.clipboard.writeText(this.outputText);
+
+        this.#showNotification('Copied to clipboard!');
+    }
+
+    #showNotification(msg) {
+        // Show notification
+        const notificationElement = document.createElement('div');
+        notificationElement.className = 'alert';
+        notificationElement.innerText = msg;
+        
+        document.body.append(notificationElement);
+
+        setTimeout(() => {
+            notificationElement.parentElement.removeChild(notificationElement);
+        }, 3000);
     }
 
     #clearEverything() {
