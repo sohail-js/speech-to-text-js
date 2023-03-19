@@ -7,6 +7,8 @@ export class SpeechToText {
     #copyButtonElement;
     #recognition;
     #_activeText;
+
+    isListening = false;
     
     get activeText() {
         return this.#_activeText;
@@ -28,6 +30,9 @@ export class SpeechToText {
      * @param {{
      *      micElementSelector: string | HTMLElement;
      *      outputElementSelector: string | HTMLElement;
+     *      stopElementSelector: string | HTMLElement;
+     *      clearElementSelector: string | HTMLElement;
+     *      copyElementSelector: string | HTMLElement;
      * }} options 
      */
     constructor({
@@ -43,7 +48,13 @@ export class SpeechToText {
         this.#clearButtonElement = typeof clearElementSelector === 'string' ? document.querySelector(clearElementSelector) : clearElementSelector;
         this.#copyButtonElement = typeof copyElementSelector === 'string' ? document.querySelector(copyElementSelector) : copyElementSelector;
 
+        this.#addEventListeners();
         this.#enableSpeechRecognition();
+    }
+
+    #addEventListeners() {
+        this.#micButtonElement.addEventListener('click', this.#startRecognition.bind(this));
+        this.#stopButtonElement.addEventListener('click', this.#stopRecognition.bind(this));
     }
 
     #enableSpeechRecognition() {
@@ -71,22 +82,25 @@ export class SpeechToText {
     
             this.#onRecognitionEnd();
         });
-        
-        this.#micButtonElement.addEventListener('click', event => {
-            console.log('listening...');
-            this.#startRecognition();
-        })
     }
 
     #startRecognition() {
+        this.isListening = true;
         this.activeText = '';
         this.#recognition.start();
     }
 
+    #stopRecognition() {
+        this.isListening = false;
+        this.#recognition.stop();
+    }
+
     #onRecognitionEnd() {
         this.#updateOutputText();
-
-        this.#startRecognition();
+        this.activeText = '';
+        if(this.isListening) {
+            this.#startRecognition();
+        }
     }
 
     #updateOutputText() {
