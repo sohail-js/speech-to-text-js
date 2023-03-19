@@ -10,12 +10,18 @@
 <body>
 
     <div class="container">
-        <button class="mic">
-            Mic
-        </button>
-        <div class="text">Start speaking...</div>
+        <div class="toolbar">
+            <button class="start-listening">Start</button>
+            <button class="stop-listening">Stop</button>
+            <button class="clear-everything">Clear</button>
+            <button class="copy-text">Copy</button>
+        </div>
+        <div class="text">
+            Start speaking...
+            <span class="active-text"></span>
+        </div>
     </div>
 
-    <script src="./app.js"></script>
+    <script src="./app.js" type="module"></script>
 </body>
 </html>
