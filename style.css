@@ -1,0 +1,22 @@
+body {
+    background-color: blueviolet;
+}
+
+.container {
+    background-color: #fff;
+    border-radius: 15px;
+    width: 600px;
+    margin: 25px auto;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    /* box-shadow: ; */
+}
+
+
+.container .text {
+    margin: 15px 0;
+    border: 1px solid #cccccc85;
+    padding: 10px;
+    border-radius: 10px;
+}
