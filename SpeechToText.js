@@ -1,13 +1,23 @@
 export class SpeechToText {
     
-    #micButtonElement;
+    #startButtonElement;
     #outputElement;
     #stopButtonElement;
     #clearButtonElement;
     #copyButtonElement;
     #recognition;
     
-    isListening = false;
+    _isListening;
+    get isListening() {
+        return this._isListening;
+    }
+
+    set isListening(value) {
+        this._isListening = value;
+
+        this.#startButtonElement.style.display = value ? 'none' : 'block';
+        this.#stopButtonElement.style.display = !value ? 'none' : 'block';
+    }
     
     #_activeText;
     get activeText() {
@@ -50,20 +60,21 @@ export class SpeechToText {
         clearElementSelector,
         copyElementSelector,
     }) {
-        this.#micButtonElement = typeof micElementSelector === 'string' ? document.querySelector(micElementSelector) : micElementSelector;
+        this.#startButtonElement = typeof micElementSelector === 'string' ? document.querySelector(micElementSelector) : micElementSelector;
         this.#outputElement = typeof outputElementSelector === 'string' ? document.querySelector(outputElementSelector) : outputElementSelector;
-        this.#outputElement.innerHTML = `<span class="output"></span><span class="active-text"></span>`;
+        this.#outputElement.innerHTML = `<span class="output">Hola Amigos</span><span class="active-text"></span>`;
         this.#stopButtonElement = typeof stopElementSelector === 'string' ? document.querySelector(stopElementSelector) : stopElementSelector;
         this.#clearButtonElement = typeof clearElementSelector === 'string' ? document.querySelector(clearElementSelector) : clearElementSelector;
         this.#copyButtonElement = typeof copyElementSelector === 'string' ? document.querySelector(copyElementSelector) : copyElementSelector;
 
+        this.isListening = false;
         this.#addEventListeners();
         this.#enableSpeechRecognition();
     }
 
     #addEventListeners() {
-        this.#micButtonElement.addEventListener('click', this.#startRecognition.bind(this));
-        this.#stopButtonElement.addEventListener('click', this.#stopRecognition.bind(this));
+        this.#startButtonElement.addEventListener('click', this.startRecognition.bind(this));
+        this.#stopButtonElement.addEventListener('click', this.stopRecognition.bind(this));
         this.#clearButtonElement.addEventListener('click', this.#clearEverything.bind(this));
         this.#copyButtonElement.addEventListener('click', this.#copyOutput.bind(this));
     }
@@ -120,13 +131,13 @@ export class SpeechToText {
         });
     }
 
-    #startRecognition() {
+    startRecognition() {
         this.isListening = true;
         this.activeText = '';
         this.#recognition.start();
     }
 
-    #stopRecognition() {
+    stopRecognition() {
         this.isListening = false;
         this.#recognition.stop();
     }
@@ -135,7 +146,7 @@ export class SpeechToText {
         this.#updateOutputText();
         this.activeText = '';
         if(this.isListening) {
-            this.#startRecognition();
+            this.startRecognition();
         }
     }
 

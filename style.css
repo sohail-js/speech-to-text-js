@@ -1,24 +1,29 @@
 body {
-    background-color: blueviolet;
+    background-color: black;
+    font-family: Roboto;
 }
 
 .container {
-    background-color: #fff;
-    border-radius: 15px;
-    width: 600px;
-    margin: 25px auto;
+    background: rgb(0,30,98);
+    background: radial-gradient(circle, rgba(0,30,98,1) 0%, rgba(2,32,64,1) 100%);
+    border-radius: 40px;
+    min-height: 500px;
+    margin: 25px 10px;
     display: flex;
     flex-direction: column;
-    padding: 20px;
-    /* box-shadow: ; */
+    box-shadow: 0 0 18px 0px #ffffff2b;
 }
 
 
 .container .text {
-    margin: 15px 0;
-    border: 1px solid #cccccc85;
-    padding: 10px;
-    border-radius: 10px;
+    padding: 35px 25px;
+    margin-bottom: 15px;
+    color: white;
+    font-size: 20px;
+    border-radius: 15px;
+    flex-grow: 1;
+    height: 600px;
+    overflow: auto;
 }
 
 .alert {
@@ -45,4 +50,42 @@ body {
         bottom: 10%;
         opacity: 1;
     }
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 30px;
+    border-radius: 40px;
+    border-top-left-radius: 50px;
+    border-top-right-radius: 50px;
+    background: rgb(27,36,88);
+    background: linear-gradient(162deg, rgb(16 59 147) 0%, rgb(0 18 49) 100%);
+    box-shadow: 0 0 20px 5px #0000004a;
+}
+
+.toolbar button {
+    cursor: pointer;
+}
+
+.mic-btn {
+    width: 100px;
+    height: 100px;
+    /* box-shadow: 2px 2px 10px rgba(0,0,0,.25) inset, -2px -2px 10px white inset; */
+    border-radius: 100px;
+    border: 1px solid #ffffff80;
+    margin: auto;
+    background: rgb(1,98,169);
+    background: linear-gradient(128deg, rgb(16 58 88 / 55%) 0%, rgb(149 216 255 / 60%) 100%);
+    color: white;
+}
+
+.other-buttons button{
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.575);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 50px;
+    font-size: 16px;
 }
