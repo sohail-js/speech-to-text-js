@@ -1,9 +1,8 @@
 import { SpeechToText } from "./SpeechToText.js";
 
 new SpeechToText({
-    micElementSelector: '.start-listening',
+    micElementSelector: '.mic-btn',
     outputElementSelector: '.text',
-    stopElementSelector: '.stop-listening',
     clearElementSelector: '.clear-everything',
     copyElementSelector: '.copy-text'
 });

@@ -1,8 +1,7 @@
 export class SpeechToText {
     
-    #startButtonElement;
+    #micButtonElement;
     #outputElement;
-    #stopButtonElement;
     #clearButtonElement;
     #copyButtonElement;
     #recognition;
@@ -15,8 +14,11 @@ export class SpeechToText {
     set isListening(value) {
         this._isListening = value;
 
-        this.#startButtonElement.style.display = value ? 'none' : 'block';
-        this.#stopButtonElement.style.display = !value ? 'none' : 'block';
+        if(value) {
+            this.#micButtonElement.classList.add('listening');
+        } else {
+            this.#micButtonElement.classList.remove('listening');
+        }
     }
     
     #_activeText;
@@ -56,14 +58,12 @@ export class SpeechToText {
     constructor({
         micElementSelector,
         outputElementSelector,
-        stopElementSelector,
         clearElementSelector,
         copyElementSelector,
     }) {
-        this.#startButtonElement = typeof micElementSelector === 'string' ? document.querySelector(micElementSelector) : micElementSelector;
+        this.#micButtonElement = typeof micElementSelector === 'string' ? document.querySelector(micElementSelector) : micElementSelector;
         this.#outputElement = typeof outputElementSelector === 'string' ? document.querySelector(outputElementSelector) : outputElementSelector;
-        this.#outputElement.innerHTML = `<span class="output">Hola Amigos</span><span class="active-text"></span>`;
-        this.#stopButtonElement = typeof stopElementSelector === 'string' ? document.querySelector(stopElementSelector) : stopElementSelector;
+        this.#outputElement.innerHTML = `<span class="output"></span><span class="active-text"></span>`;
         this.#clearButtonElement = typeof clearElementSelector === 'string' ? document.querySelector(clearElementSelector) : clearElementSelector;
         this.#copyButtonElement = typeof copyElementSelector === 'string' ? document.querySelector(copyElementSelector) : copyElementSelector;
 
@@ -73,8 +73,7 @@ export class SpeechToText {
     }
 
     #addEventListeners() {
-        this.#startButtonElement.addEventListener('click', this.startRecognition.bind(this));
-        this.#stopButtonElement.addEventListener('click', this.stopRecognition.bind(this));
+        this.#micButtonElement.addEventListener('click', this.toggleListen.bind(this));
         this.#clearButtonElement.addEventListener('click', this.#clearEverything.bind(this));
         this.#copyButtonElement.addEventListener('click', this.#copyOutput.bind(this));
     }
@@ -108,6 +107,7 @@ export class SpeechToText {
         window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         this.#recognition = new SpeechRecognition();
         this.#recognition.interimResults = true;
+        this.#recognition.lang = 'en-AU';
     
         this.#recognition.addEventListener('result', e => {
             const transcript = Array.from(e.results)
@@ -117,10 +117,10 @@ export class SpeechToText {
     
             // document.getElementById("p").innerHTML = transcript;
             this.activeText = ' ' + transcript;
-            console.log(transcript);
         });
     
         this.#recognition.addEventListener('end', e => {
+            console.log('Done', this.activeText);
             // console.log('listening done', e)
             // change back to normal voice icon
             // this.shadowRoot.querySelector('.listening').style.display = 'none';
@@ -129,6 +129,14 @@ export class SpeechToText {
     
             this.#onRecognitionEnd();
         });
+    }
+
+    toggleListen() {
+        if(this.isListening) {
+            this.stopRecognition();
+        } else {
+            this.startRecognition();
+        }
     }
 
     startRecognition() {
@@ -143,17 +151,23 @@ export class SpeechToText {
     }
 
     #onRecognitionEnd() {
+        console.log(this.activeText);
         this.#updateOutputText();
-        this.activeText = '';
         if(this.isListening) {
             this.startRecognition();
         }
     }
 
     #updateOutputText() {
+        if(!this.activeText) {
+            return;
+        }
+
+        console.log(this.activeText);
         const textElement = document.createElement('span');
         textElement.innerText = ' '+this.activeText;
 
         this.#outputTextElement.append(textElement);
+        this.activeText = '';
     }
 }
