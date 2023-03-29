@@ -107,7 +107,7 @@ export class SpeechToText {
         window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         this.#recognition = new SpeechRecognition();
         this.#recognition.interimResults = true;
-        this.#recognition.lang = 'en-AU';
+        // this.#recognition.lang = 'en-AU';
     
         this.#recognition.addEventListener('result', e => {
             const transcript = Array.from(e.results)
