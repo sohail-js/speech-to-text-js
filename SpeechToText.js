@@ -120,7 +120,7 @@ export class SpeechToText {
         });
     
         this.#recognition.addEventListener('end', e => {
-            console.log('Done', this.activeText);
+            // console.log('Done', this.activeText);
             // console.log('listening done', e)
             // change back to normal voice icon
             // this.shadowRoot.querySelector('.listening').style.display = 'none';
@@ -151,11 +151,19 @@ export class SpeechToText {
     }
 
     #onRecognitionEnd() {
-        console.log(this.activeText);
+        // console.log(this.activeText);
         this.#updateOutputText();
         if(this.isListening) {
             this.startRecognition();
         }
+    }
+
+    onSentenceEnd(newLine) {
+        console.log(
+            '%cSpeech to Text',
+            'padding: 3px 5px; border: 2px solid lightblue; border-radius: 5px',
+            'Looks like you are not catching onSentenceEnd event. To do so, you can override the method "onSentenceEnd" in your instance'
+        )
     }
 
     #updateOutputText() {
@@ -163,11 +171,13 @@ export class SpeechToText {
             return;
         }
 
-        console.log(this.activeText);
+        // console.log(this.activeText);
         const textElement = document.createElement('span');
         textElement.innerText = ' '+this.activeText;
 
         this.#outputTextElement.append(textElement);
+
+        this.onSentenceEnd(this.activeText);
         this.activeText = '';
     }
 }
