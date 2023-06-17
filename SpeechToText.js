@@ -4,8 +4,8 @@ export class SpeechToText {
     #outputElement;
     #clearButtonElement;
     #copyButtonElement;
-    #recognition;
-    
+    #speechRecognition;
+
     _isListening;
     get isListening() {
         return this._isListening;
@@ -14,7 +14,7 @@ export class SpeechToText {
     set isListening(value) {
         this._isListening = value;
 
-        if(value) {
+        if (value) {
             this.#micButtonElement.classList.add('listening');
         } else {
             this.#micButtonElement.classList.remove('listening');
@@ -28,48 +28,119 @@ export class SpeechToText {
 
     set activeText(value) {
         this.#_activeText = value;
-        if(this.#activeTextElement) {
-            this.#activeTextElement.innerText = value;
-        }
+        this.#activeTextElement.innerText = value;
     }
 
-    get #activeTextElement() {
-        return this.#outputElement.querySelector('.active-text');
-    }
+    #activeTextElement;
+    #outputTextElement;
 
-    get #outputTextElement() {
-        return this.#outputElement.querySelector('.output');
-    }
-
+    #_outputText = '';
     get outputText() {
-        return this.#outputTextElement.innerText;
+        return this.#_outputText;
+    }
+    
+    set outputText(value) {
+        this.#_outputText = value;
+        this.#outputTextElement.innerHTML = value;
     }
 
     /**
      * 
      * @param {{
-     *      micElementSelector: string | HTMLElement;
-     *      outputElementSelector: string | HTMLElement;
-     *      stopElementSelector: string | HTMLElement;
-     *      clearElementSelector: string | HTMLElement;
-     *      copyElementSelector: string | HTMLElement;
+     *      micElementSelector: string;
+     *      outputElementSelector: string;
+     *      clearElementSelector: string;
+     *      copyElementSelector: string;
      * }} options 
      */
-    constructor({
-        micElementSelector,
-        outputElementSelector,
-        clearElementSelector,
-        copyElementSelector,
-    }) {
-        this.#micButtonElement = typeof micElementSelector === 'string' ? document.querySelector(micElementSelector) : micElementSelector;
-        this.#outputElement = typeof outputElementSelector === 'string' ? document.querySelector(outputElementSelector) : outputElementSelector;
-        this.#outputElement.innerHTML = `<span class="output"></span><span class="active-text"></span>`;
-        this.#clearButtonElement = typeof clearElementSelector === 'string' ? document.querySelector(clearElementSelector) : clearElementSelector;
-        this.#copyButtonElement = typeof copyElementSelector === 'string' ? document.querySelector(copyElementSelector) : copyElementSelector;
+    constructor(options) {
+        // if(!micElementSelector) {
+        //     console.error('Please pass the selector: "micElementSelector"');
+        //     return;
+        // }
+        if (this.#optionsNullCheck(options)) {
+            console.error('Closing app...');
+            return;
+        }
 
+        const {
+            micElementSelector,
+            outputElementSelector,
+            clearElementSelector,
+            copyElementSelector,
+        } = options;
+
+        this.#micButtonElement = document.querySelector(micElementSelector);
+        this.#outputElement = document.querySelector(outputElementSelector);
+        this.#clearButtonElement = document.querySelector(clearElementSelector);
+        this.#copyButtonElement = document.querySelector(copyElementSelector);
+
+        this.#outputElement.innerHTML = `<span class="output"></span><span class="active-text"></span>`;
+        
+        this.#activeTextElement = this.#outputElement.querySelector('.active-text');
+        this.#outputTextElement = this.#outputElement.querySelector('.output');
+        
         this.isListening = false;
         this.#addEventListeners();
         this.#enableSpeechRecognition();
+    }
+
+    #extractTranscript(event) {
+        return event.results[0][0].transcript;
+    }
+
+    #enableSpeechRecognition() {
+        window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        // Step-1: Create instance
+        this.#speechRecognition = new SpeechRecognition();
+        this.#speechRecognition.interimResults = true;
+        
+        // Step-2: add 'result' listener
+        this.#speechRecognition.addEventListener('result', event => {
+            console.log(event.results);
+            const transcript = this.#extractTranscript(event);
+            // console.log('Output: ', transcript);
+            this.activeText = ' ' + transcript;
+        });
+
+        // this.#speechRecognition.start();
+        this.#speechRecognition.addEventListener('end', this.#onRecognitionEnd.bind(this));
+    }
+
+    #onRecognitionEnd() {
+        this.#updateOutputText();
+        if (this.isListening) {
+            this.startRecognition();
+        }
+    }
+
+    /**
+     * Add the activeText to the final output
+     */
+    #updateOutputText() {
+        if (!this.activeText) {
+            return;
+        }
+
+        this.outputText += ' ' + this.activeText;
+
+        this.activeText = '';
+    }
+
+    #optionsNullCheck(options) {
+        const nullSelectors = [
+            'micElementSelector',
+            'outputElementSelector',
+            'clearElementSelector',
+            'copyElementSelector'
+        ].filter(selector => !options[selector]);
+
+        if (nullSelectors.length) {
+            console.error(`Please provide the following selectors: ${nullSelectors.join(', ')}`);
+            return true;
+        }
+
+        return false;
     }
 
     #addEventListeners() {
@@ -78,61 +149,8 @@ export class SpeechToText {
         this.#copyButtonElement.addEventListener('click', this.#copyOutput.bind(this));
     }
 
-    #copyOutput() {
-        // Copy to clipboard
-        navigator.clipboard.writeText(this.outputText);
-
-        this.#showNotification('Copied to clipboard!');
-    }
-
-    #showNotification(msg) {
-        // Show notification
-        const notificationElement = document.createElement('div');
-        notificationElement.className = 'alert';
-        notificationElement.innerText = msg;
-        
-        document.body.append(notificationElement);
-
-        setTimeout(() => {
-            notificationElement.parentElement.removeChild(notificationElement);
-        }, 3000);
-    }
-
-    #clearEverything() {
-        this.activeText = '';
-        this.#outputTextElement.innerHTML = ``;
-    }
-
-    #enableSpeechRecognition() {
-        window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        this.#recognition = new SpeechRecognition();
-        this.#recognition.interimResults = true;
-        // this.#recognition.lang = 'en-AU';
-    
-        this.#recognition.addEventListener('result', e => {
-            const transcript = Array.from(e.results)
-                .map(result => result[0])
-                .map(result => result.transcript)
-                .join('')
-    
-            // document.getElementById("p").innerHTML = transcript;
-            this.activeText = ' ' + transcript;
-        });
-    
-        this.#recognition.addEventListener('end', e => {
-            // console.log('Done', this.activeText);
-            // console.log('listening done', e)
-            // change back to normal voice icon
-            // this.shadowRoot.querySelector('.listening').style.display = 'none';
-            // this.shadowRoot.querySelector('.voice').style.display = 'block';
-            // this.shadowRoot.querySelector('#searchInput').placeholder = 'Gainsight Finder';
-    
-            this.#onRecognitionEnd();
-        });
-    }
-
     toggleListen() {
-        if(this.isListening) {
+        if (this.isListening) {
             this.stopRecognition();
         } else {
             this.startRecognition();
@@ -141,43 +159,36 @@ export class SpeechToText {
 
     startRecognition() {
         this.isListening = true;
-        this.activeText = '';
-        this.#recognition.start();
+        this.#speechRecognition.start();
     }
 
     stopRecognition() {
         this.isListening = false;
-        this.#recognition.stop();
+        this.#speechRecognition.stop();
     }
 
-    #onRecognitionEnd() {
-        // console.log(this.activeText);
-        this.#updateOutputText();
-        if(this.isListening) {
-            this.startRecognition();
-        }
-    }
 
-    onSentenceEnd(newLine) {
-        console.log(
-            '%cSpeech to Text',
-            'padding: 3px 5px; border: 2px solid lightblue; border-radius: 5px',
-            'Looks like you are not catching onSentenceEnd event. To do so, you can override the method "onSentenceEnd" in your instance'
-        )
-    }
-
-    #updateOutputText() {
-        if(!this.activeText) {
-            return;
-        }
-
-        // console.log(this.activeText);
-        const textElement = document.createElement('span');
-        textElement.innerText = ' '+this.activeText;
-
-        this.#outputTextElement.append(textElement);
-
-        this.onSentenceEnd(this.activeText);
+    // TODO
+    #clearEverything() {
         this.activeText = '';
+        this.outputText = '';
+    }
+    
+    // TODO
+    #copyOutput() {
+        navigator.clipboard.writeText(this.outputText);
+        this.#showNotification('Copied to clipboard!');
+    }
+
+    #showNotification(msg) {
+        const notificationElement = document.createElement('div');
+        notificationElement.className = 'alert';
+        notificationElement.innerText = msg;
+
+        document.body.append(notificationElement);
+
+        setTimeout(() => {
+            notificationElement.parentElement.removeChild(notificationElement);
+        }, 3000);
     }
 }

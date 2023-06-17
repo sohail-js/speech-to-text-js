@@ -5,7 +5,3 @@ const speechToText = new SpeechToText({
     clearElementSelector: '.clear-everything',
     copyElementSelector: '.copy-text'
 });
-
-speechToText.onSentenceEnd = (newLine) => {
-    console.log('I got this >>', newLine);
-}
