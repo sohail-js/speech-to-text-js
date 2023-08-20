@@ -167,14 +167,11 @@ export class SpeechToText {
         this.#speechRecognition.stop();
     }
 
-
-    // TODO
     #clearEverything() {
         this.activeText = '';
         this.outputText = '';
     }
     
-    // TODO
     #copyOutput() {
         navigator.clipboard.writeText(this.outputText);
         this.#showNotification('Copied to clipboard!');
