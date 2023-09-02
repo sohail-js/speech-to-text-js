@@ -30,7 +30,7 @@
         </div>
         <div class="footer">
             <a target="_blank" href="https://github.com/sohail-js/speech-to-text-js">Source Code</a>
-            <a target="_blank" href="https://youtube.com/@JavaScriptWithSohail">Tutorial</a>
+            <a target="_blank" href="https://youtu.be/WpJl-F4MGAY">Tutorial</a>
             
             <span>
                 By <a target="_blank" href="https://linktr.ee/javascriptwithsohail">JavaScript With Sohail</a>
@@ -41,5 +41,29 @@
     <!-- <div class="alert">Copied to clipboard!</div> -->
 
     <script src="./app.js" type="module"></script>
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+          apiKey: "AIzaSyDLZgbqF3hG7Xij2rItSm96Tc4fbjjPeRA",
+          authDomain: "speech-to-text-js.firebaseapp.com",
+          projectId: "speech-to-text-js",
+          storageBucket: "speech-to-text-js.appspot.com",
+          messagingSenderId: "758714826957",
+          appId: "1:758714826957:web:ae55648e7cd80e01e1a984",
+          measurementId: "G-HVWRNVWGQG"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+      </script>
 </body>
 </html>
